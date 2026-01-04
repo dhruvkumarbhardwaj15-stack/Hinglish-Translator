@@ -1,0 +1,7 @@
+{
+  "name": "Hinglish to Hindi Converter",
+  "description": "A sophisticated tool that converts Romanized Hindi (Hinglish) into beautiful Devanagari script. It provides multiple variations, context clues, and an easy one-click copy feature.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
