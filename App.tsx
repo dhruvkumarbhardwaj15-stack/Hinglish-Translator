@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { transliterateHinglish } from './services/geminiService';
-import { HindiResult, HistoryItem } from './types';
-import Header from './components/Header';
-import InputArea from './components/InputArea';
-import ResultDisplay from './components/ResultDisplay';
-import HistoryPanel from './components/HistoryPanel';
-import Toast from './components/Toast';
+import { transliterateHinglish } from './services/geminiService.ts';
+import { HindiResult, HistoryItem } from './types.ts';
+import Header from './components/Header.tsx';
+import InputArea from './components/InputArea.tsx';
+import ResultDisplay from './components/ResultDisplay.tsx';
+import HistoryPanel from './components/HistoryPanel.tsx';
+import Toast from './components/Toast.tsx';
 
 const App: React.FC = () => {
   const [input, setInput] = useState('');

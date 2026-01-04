@@ -1,11 +1,11 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { HindiResult } from "../types";
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+import { HindiResult } from "../types.ts";
 
 export const transliterateHinglish = async (input: string): Promise<HindiResult[]> => {
   if (!input.trim()) return [];
+
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
