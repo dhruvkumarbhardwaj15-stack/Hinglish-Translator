@@ -5,14 +5,16 @@ import { HindiResult } from "../types.ts";
 export const transliterateHinglish = async (input: string): Promise<HindiResult[]> => {
   if (!input.trim()) return [];
 
+  // Create instance right before call for the latest key
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: `Convert this Romanized Hindi (Hinglish) into Devanagari Hindi: "${input}"`,
+    model: "gemini-flash-lite-latest", // Optimized for ultra-low latency
+    contents: `Convert to Devanagari: "${input}"`,
     config: {
-      systemInstruction: "You are a specialized Hinglish-to-Hindi transliterator. Given Romanized Hindi text, return an array of possible Devanagari translations. Include formal variations, common spellings, and informal versions if applicable. Keep the context brief.",
+      systemInstruction: "Convert Romanized Hindi to Devanagari. Return a JSON array of objects with 'hindi' (Devanagari) and 'context' (brief type). Max 3 variations.",
       responseMimeType: "application/json",
+      thinkingConfig: { thinkingBudget: 0 }, // Disable thinking for immediate output
       responseSchema: {
         type: Type.ARRAY,
         items: {
@@ -20,11 +22,9 @@ export const transliterateHinglish = async (input: string): Promise<HindiResult[
           properties: {
             hindi: {
               type: Type.STRING,
-              description: "The Devanagari Hindi word or phrase."
             },
             context: {
               type: Type.STRING,
-              description: "Brief context about this specific variation (e.g., 'Formal', 'Informal', 'Common Spelling')."
             }
           },
           required: ["hindi", "context"]

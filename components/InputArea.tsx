@@ -77,7 +77,7 @@ const InputArea: React.FC<InputAreaProps> = ({ value, onChange, onSubmit, isLoad
       audioContextRef.current = audioContext;
 
       const sessionPromise = ai.live.connect({
-        model: 'gemini-2.5-flash-native-audio-preview-09-2025',
+        model: 'gemini-2.5-flash-native-audio-preview-12-2025',
         callbacks: {
           onopen: () => {
             if (!audioContextRef.current || !streamRef.current) return;
@@ -121,10 +121,11 @@ const InputArea: React.FC<InputAreaProps> = ({ value, onChange, onSubmit, isLoad
         config: {
           responseModalities: [Modality.AUDIO],
           inputAudioTranscription: {},
+          thinkingConfig: { thinkingBudget: 0 }, // Minimize delay for transcription
           speechConfig: {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Zephyr' } },
           },
-          systemInstruction: 'You are a transcription assistant. Only transcribe the user speech into Romanized Hindi (Hinglish). Do not talk back.',
+          systemInstruction: 'Only transcribe user speech into Romanized Hindi. No conversational output.',
         },
       });
 
