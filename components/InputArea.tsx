@@ -7,9 +7,18 @@ interface InputAreaProps {
   onChange: (val: string | ((prev: string) => string)) => void;
   onSubmit: () => void;
   isLoading: boolean;
+  finalHindiText?: string;
+  onCopy?: (text: string) => void;
 }
 
-const InputArea: React.FC<InputAreaProps> = ({ value, onChange, onSubmit, isLoading }) => {
+const InputArea: React.FC<InputAreaProps> = ({ 
+  value, 
+  onChange, 
+  onSubmit, 
+  isLoading,
+  finalHindiText = "",
+  onCopy
+}) => {
   const [isListening, setIsListening] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -155,11 +164,18 @@ const InputArea: React.FC<InputAreaProps> = ({ value, onChange, onSubmit, isLoad
     onChange('');
   };
 
+  const wordCount = value.trim() ? value.trim().split(/\s+/).length : 0;
+
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-semibold text-slate-600 dark:text-slate-400">Enter Romanized Hindi</label>
-        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono hidden sm:inline">Example: "Namaste" or "Aap kaise hain?"</span>
+        <label className="text-sm font-bold text-slate-700 dark:text-slate-350 flex items-center gap-1.5 uppercase tracking-wide">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Type Hinglish here
+        </label>
+        <span className="text-xs text-slate-400 dark:text-slate-500 font-semibold">{value.length} chars</span>
       </div>
       
       <div className="relative">
@@ -168,8 +184,8 @@ const InputArea: React.FC<InputAreaProps> = ({ value, onChange, onSubmit, isLoad
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type Hinglish text or use the mic..."
-          className="w-full h-48 p-5 text-lg leading-relaxed border-2 border-slate-100 dark:border-slate-800 rounded-2xl focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-0 transition-all resize-none bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-slate-100 overflow-y-auto"
-          style={{ fontSize: '1.125rem', minHeight: '12rem' }}
+          className="w-full h-44 p-5 text-lg leading-relaxed border-2 border-slate-100 dark:border-slate-800 rounded-2xl focus:border-indigo-500 dark:focus:border-indigo-500 focus:ring-0 transition-all resize-none bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-slate-100 overflow-y-auto"
+          style={{ fontSize: '1.125rem', minHeight: '11rem' }}
           disabled={isLoading}
         />
         
@@ -181,12 +197,13 @@ const InputArea: React.FC<InputAreaProps> = ({ value, onChange, onSubmit, isLoad
         )}
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-end items-center gap-3 sm:gap-4">
-        <div className="flex items-center space-x-2 w-full sm:w-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 border-t border-slate-50 dark:border-slate-850 pt-3">
+        {/* Left Actions: Clear & Copy Hindi */}
+        <div className="flex items-center space-x-2.5 w-full sm:w-auto">
           {value && !isLoading && !isListening && (
             <button
               onClick={handleClear}
-              className="flex-1 sm:flex-none px-4 py-3.5 rounded-xl font-bold text-sm text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex items-center justify-center space-x-2"
+              className="px-4 py-2.5 rounded-xl font-bold text-sm text-slate-500 hover:text-red-500 transition-all flex items-center justify-center space-x-2 hover:bg-red-50 dark:hover:bg-red-950/40"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -195,46 +212,61 @@ const InputArea: React.FC<InputAreaProps> = ({ value, onChange, onSubmit, isLoad
             </button>
           )}
 
+          {finalHindiText && onCopy && !isLoading && (
+            <button
+              onClick={() => onCopy(finalHindiText)}
+              className="px-4 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 font-bold text-sm border border-indigo-100 dark:border-indigo-900/40 hover:bg-indigo-600 hover:text-white transition-all flex items-center justify-center space-x-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+              <span>Copy Hindi</span>
+            </button>
+          )}
+        </div>
+
+        {/* Right Actions: Voice & Convert */}
+        <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
           <button
             onClick={handleMicClick}
             disabled={isLoading}
-            className={`p-3.5 rounded-xl transition-all flex items-center justify-center shadow-lg flex-1 sm:flex-none
+            className={`p-3.5 rounded-xl transition-all flex items-center justify-center shadow-md
               ${isListening 
                 ? 'bg-red-500 text-white shadow-red-200 dark:shadow-none animate-pulse ring-4 ring-red-500/20' 
                 : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500'}`}
             title={isListening ? "Stop Listening" : "Start Voice Input"}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
             </svg>
           </button>
+          
+          <button
+            onClick={onSubmit}
+            disabled={isLoading || !value.trim() || isListening}
+            className={`px-8 py-3.5 rounded-xl font-bold text-base shadow-md transition-all flex items-center justify-center space-x-3 
+              ${isLoading || !value.trim() || isListening
+                ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed' 
+                : 'bg-indigo-600 text-white hover:bg-indigo-700 active:transform active:scale-95'}`}
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                <span>Converting...</span>
+              </>
+            ) : (
+              <>
+                <span>Convert to Hindi</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                </svg>
+              </>
+            )}
+          </button>
         </div>
-        
-        <button
-          onClick={onSubmit}
-          disabled={isLoading || !value.trim() || isListening}
-          className={`w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-base shadow-lg transition-all flex items-center justify-center space-x-3 
-            ${isLoading || !value.trim() || isListening
-              ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed shadow-none' 
-              : 'bg-indigo-600 text-white hover:bg-indigo-700 active:transform active:scale-95 shadow-indigo-200/50 dark:shadow-none'}`}
-        >
-          {isLoading ? (
-            <>
-              <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-              <span>Converting...</span>
-            </>
-          ) : (
-            <>
-              <span>Convert to Hindi</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-              </svg>
-            </>
-          )}
-        </button>
       </div>
     </div>
   );
